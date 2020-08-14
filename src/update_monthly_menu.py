@@ -36,6 +36,7 @@ if __name__ == "__main__":
 
     # Create a schedule for the current month's work
     df = menu_excel.copy()
+    df['is_holiday'] = df['Date'].map(skrk.is_holiday).astype(int)
     df = df.loc[:, ['Date', 'is_holiday']].drop_duplicates(subset='Date')
     df.reset_index(inplace=True)
 
