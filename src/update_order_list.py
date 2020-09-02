@@ -28,8 +28,8 @@ if __name__ == "__main__":
     TODAY = datetime.now(timezone(timedelta(hours=+9), 'JST')).date()
     # TODAY = datetime.strptime('2020/07/23', '%Y/%m/%d').date()
 
-    db_df_today = db_df[(db_df['Date'] >= TODAY + timedelta(days=3)) & (
-        db_df['Date'] < TODAY + timedelta(days=8))].drop(['Price', 'Count'], axis=1)
+    db_df_today = db_df[(db_df['Date'] >= TODAY + timedelta(days=0)) & (
+        db_df['Date'] < TODAY + timedelta(days=5))].drop(['Price', 'Count'], axis=1)
 
     # Instance of shokuraku spreadsheet
     skrk = orderlunch.Shokuraku(

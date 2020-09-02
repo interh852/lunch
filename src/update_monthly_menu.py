@@ -34,48 +34,10 @@ if __name__ == "__main__":
             [menu_excel, skrk.tidy_lunch_menu_a_week(lunch_menu[i:(i + 7)])])
     menu_excel['Date'] = menu_excel['Date'].dt.date
 
-    # Create a schedule for the current month's work
-    df = menu_excel.copy()
-    df['is_holiday'] = df['Date'].map(skrk.is_holiday).astype(int)
-    df = df.loc[:, ['Date', 'is_holiday']].drop_duplicates(subset='Date')
-    df.reset_index(inplace=True)
-
-    # update monthly menu
-    df['update_monthly_menu'] = np.nan
-    df['update_monthly_menu'].iloc[-5] = 1
-
-    # check order
-    df.loc[df['index'] == 1, 'check_order'] = 1
-
-    # update order list
-    df.loc[df['index'] == 5, 'update_order_list'] = 1
-
-    # update database
-    df_weekday = df.copy()
-    df_weekday['is_holiday'] = df_weekday['Date'].map(
-        skrk.is_holiday).astype(int)
-    df_weekday['is_holiday_lag'] = df_weekday['is_holiday'] - \
-        df_weekday['is_holiday'].shift(-1)
-    df_weekday.loc[(df_weekday['index'] == 5) & (df_weekday['is_holiday'] == 0) & (
-        df_weekday['is_holiday_lag'] == 0), 'update_db'] = 1
-    df_weekday.loc[(df_weekday['is_holiday'] == 0) & (
-        df_weekday['is_holiday_lag'] == -1), 'update_db'] = 1
-    df_weekday['update_db'] = df_weekday['update_db'].shift(-1)
-    df_weekday['update_db'].iloc[-2] = 1
-    df_weekday = df_weekday[df_weekday['is_holiday']
-                            == 0].loc[:, ['update_db']]
-
-    df = df.join(df_weekday).drop(['index'], axis=1)
-    df = df.fillna(0)
-
-    menu_list = pd.merge(menu_excel, df, on='Date', how='left')
-    menu_list[menu_list.select_dtypes(['float64']).columns] = menu_list.select_dtypes([
-        'float64']).apply(lambda x: x.astype('int16'))
-
     # Menu List Worksheet of shokuraku spreadsheet
     skrk_worksheet = skrk.get_worksheet(worksheet_name='Menu List')
 
-    menu_list['Date'] = menu_list['Date'].apply(
+    menu_excel['Date'] = menu_excel['Date'].apply(
         lambda x: x.strftime('%Y/%m/%d'))
-    skrk_worksheet.update([menu_list.columns.values.tolist(
-    )] + menu_list.values.tolist(), value_input_option='USER_ENTERED')
+    skrk_worksheet.update([menu_excel.columns.values.tolist(
+    )] + menu_excel.values.tolist(), value_input_option='USER_ENTERED')

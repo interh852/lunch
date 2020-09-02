@@ -44,6 +44,21 @@ class Shokuraku:
 
         return(data_cells_df)
 
+    def get_todays_task(self, worksheet):
+        """
+        Get today's task
+        """
+
+        # Get the data from Menu List Worksheet
+        df_task = skrk.get_dataframe(worksheet)
+
+        # Substract today's Task
+        TODAY = datetime.now(timezone(timedelta(hours=+9), 'JST')).date()
+        df_task_today = df_task[df_task['Date']
+                                == TODAY].reset_index(drop=True)
+
+        return(df_task_today)
+
     def convert_order_list_to_database(self, df_order_list):
         """
         conver from Order List to DataBase
@@ -83,7 +98,7 @@ class Shokuraku:
                                   df_menu.iloc[:, [8, 9]].rename(index=lambda x: 5, columns=dict(zip(df_menu.iloc[:, [8, 9]].columns, ['Menu', 'Price'])))])
 
         df_long = pd.concat([df_date, df_menu_long], axis=1)
-        
+
         return(df_long)
 
     def is_holiday(self, date):
